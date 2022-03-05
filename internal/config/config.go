@@ -1,6 +1,8 @@
 package config
 
 import (
+	"os"
+
 	"github.com/spf13/viper"
 )
 
@@ -63,22 +65,20 @@ func Init() (*Config, error) {
 }
 
 func parseEnv(cfg *Config) error {
-	// os.Setenv("TOKEN", "5124531442:AAGIiZ73NJZXUSA_epez5BZyLdugjf0pwcw")
-	// os.Setenv("API_KEY", "498f0c3860ee799bb60650d5a7c0adfa2cf5adc877dc430cdd1adef1bf402888")
-	// os.Setenv("WALLET", "EQBtZgocpA8H1S3U1uCj-Uoz1BvuDESm2laaNVEexQZ7nQPp")
-	// os.Setenv("FEE", "0.5")
-	// os.Setenv("ADMIN_CHANNEL", "-1001688233561")
-	// os.Setenv("EXCHANGE_CHANNEL", "-1001523233085")
+	os.Setenv("TOKEN", "5124531442:AAGIiZ73NJZXUSA_epez5BZyLdugjf0pwcw")
+	os.Setenv("API_KEY", "498f0c3860ee799bb60650d5a7c0adfa2cf5adc877dc430cdd1adef1bf402888")
+	os.Setenv("WALLET", "EQBtZgocpA8H1S3U1uCj-Uoz1BvuDESm2laaNVEexQZ7nQPp")
+	os.Setenv("FEE", "0.5")
+	os.Setenv("ADMIN_CHANNEL", "-1001688233561")
+	os.Setenv("EXCHANGE_CHANNEL", "-1001523233085")
 
-	// // os.Setenv("DB_DSN", "postgres://root:root@database:5432/telegrambot?sslmode=disable")
+	// os.Setenv("DB_DSN", "postgres://root:root@database:5432/telegrambot?sslmode=disable")
 
-	// os.Setenv("DB_DSN", "postgres://postgres:gorod2010@localhost/telegrambot?sslmode=disable")
+	os.Setenv("DB_DSN", "postgres://postgres:gorod2010@localhost/telegrambot?sslmode=disable")
 
-	// os.Setenv("DB_MAX_OPEN_CONNS", "25")
-	// os.Setenv("DB_MAX_IDLE_CONNS", "25")
-	// os.Setenv("DB_MAX_IDLE_TIME", "15m")
-
-
+	os.Setenv("DB_MAX_OPEN_CONNS", "25")
+	os.Setenv("DB_MAX_IDLE_CONNS", "25")
+	os.Setenv("DB_MAX_IDLE_TIME", "15m")
 
 	if err := viper.BindEnv("token"); err != nil {
 		return err
