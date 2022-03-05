@@ -8,7 +8,7 @@ on:
 env:
   REGISTRY: "registry.digitalocean.com/guarantor-bot"
   IMAGE_NAME: "guarantor-bot"
-  CONTAINER_NAME: "guarantor"
+  CONTAINER_NAME: "guarantor-bot"
 
 jobs:
   build_and_push:
