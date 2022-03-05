@@ -104,11 +104,7 @@ func(app *application) checkTransaction(done chan bool, b *tele.Bot, link string
 			errs <- err
 		}
 	}
-
-	fmt.Println(ad.Msg, ad.Paid)
-
-
-
+	
 	out:for range ticker.C {
 		select {
 			case <- done:
@@ -129,7 +125,7 @@ func(app *application) checkTransaction(done chan bool, b *tele.Bot, link string
 				}
 
 
-				_, err = b.Send(target, link)
+				_, err = b.Send(target, link + "\n\n" + fmt.Sprintf(app.config.Messages.Signature, app.config.RequestLink))
 				if err != nil {
 					errs <- err
 				}

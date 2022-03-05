@@ -1,8 +1,6 @@
 package config
 
 import (
-	"os"
-
 	"github.com/spf13/viper"
 )
 
@@ -13,6 +11,7 @@ type Config struct {
 	Wallet string
 	AdminChannel int64
 	ExchangeChannel int64
+	RequestLink string `mapstructure:"request_link"`
 	Db struct {
 		Dsn          string
 		MaxOpenConns int
@@ -44,6 +43,7 @@ type Responses struct {
 	SuccessPaymentResponse    string `mapstructure:"success_payment_response"`
 	PaymentMessage            string `mapstructure:"payment_message"`
 	AlreadyPaid 			  string `mapstructure:"already_paid"`
+	Signature 			  	  string `mapstructure:"signature"`
 }
 
 func Init() (*Config, error) {
@@ -67,20 +67,6 @@ func Init() (*Config, error) {
 
 func parseEnv(cfg *Config) error {
 
-	os.Setenv("TOKEN", "5124531442:AAGIiZ73NJZXUSA_epez5BZyLdugjf0pwcw")
-	os.Setenv("API_KEY", "498f0c3860ee799bb60650d5a7c0adfa2cf5adc877dc430cdd1adef1bf402888")
-	os.Setenv("WALLET", "EQBtZgocpA8H1S3U1uCj-Uoz1BvuDESm2laaNVEexQZ7nQPp")
-	os.Setenv("FEE", "0.1")
-	os.Setenv("ADMIN_CHANNEL", "-1001688233561")
-	os.Setenv("EXCHANGE_CHANNEL", "-1001523233085")
-
-	os.Setenv("DB_DSN", "postgresql://doadmin:gkfa8123qylxVwAv@app-cc86af8b-3b5b-41f8-af11-e750fc477993-do-user-10807910-0.b.db.ondigitalocean.com:25060/telegrambot?sslmode=require")
-
-	os.Setenv("DB_MAX_OPEN_CONNS", "25")
-	os.Setenv("DB_MAX_IDLE_CONNS", "25")
-	os.Setenv("DB_MAX_IDLE_TIME", "15m")
-
-
 	if err := viper.BindEnv("token"); err != nil {
 		return err
 	}
@@ -99,6 +85,11 @@ func parseEnv(cfg *Config) error {
 	if err := viper.BindEnv("admin_channel"); err != nil {
 		return err
 	}
+
+	if err := viper.BindEnv("request_link"); err != nil {
+		return err
+	}
+
 	if err := viper.BindEnv("exchange_channel"); err != nil {
 		return err
 	}
@@ -127,6 +118,7 @@ func parseEnv(cfg *Config) error {
 	cfg.AdminChannel = viper.GetInt64("admin_channel")
 	cfg.Fee = viper.GetFloat64("fee")
 	cfg.Db.Dsn = viper.GetString("db_dsn")
+	cfg.RequestLink = viper.GetString("request_link")
 	cfg.Db.MaxOpenConns = viper.GetInt("db_max_open_conns")
 	cfg.Db.MaxIdleConns = viper.GetInt("db_max_idle_conns")
 	cfg.Db.MaxIdleTime = viper.GetString("db_max_idle_time")
