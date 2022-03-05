@@ -41,7 +41,7 @@ services:
       - database
     networks:
       - fullstack
-    port:
+    ports:
       - "80:80"
 volumes:
   database_postgres:
