@@ -17,18 +17,20 @@ import (
 func(app *application) requestForTransaction(ch chan bool, msg string, errs chan error) {
 	client := &http.Client{}
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://toncenter.com/api/v2/getTransactions?address=%s&limit=100&to_lt=0&archival=false&api_key=%s", app.config.Wallet, app.config.ApiKey), nil)
+	
+	
 	if err != nil {
 		errs <- err
 	}
 
 	resp, err := client.Do(req)
 
-	fmt.Println(resp.StatusCode, resp.Body)
-
 	if err != nil {
 		fmt.Println("Errored when sending request to the server")
 		errs <- err
 	}
+
+	app.logger.PrintInfo("Sending a request to the ton.center to check the existence of a transaction", nil)
 
 	var res data.Response
 
@@ -46,10 +48,11 @@ func(app *application) requestForTransaction(ch chan bool, msg string, errs chan
 			}
 
 			ch <- false
-
-			fmt.Println(false)
+			
+			app.logger.PrintInfo("Transaction not found", nil)
 
 			if outMsgs.Message == msg && math.Floor(float64(value)*100)/100000000000 == float64(app.config.Fee) {
+				app.logger.PrintInfo("Transaction successfully found", nil)
 				ch <- true
 			}
 
@@ -102,7 +105,7 @@ func(app *application) checkTransaction(done chan bool, b *tele.Bot, link string
 				ticker.Stop()
 				break out
 			case status := <-ch: 
-				if status {
+				if !status {
 				target, err := b.ChatByID(app.config.ExchangeChannel)
 
 				if err != nil {
@@ -119,7 +122,7 @@ func(app *application) checkTransaction(done chan bool, b *tele.Bot, link string
 				if err != nil {
 					switch {
 					case errors.Is(err, data.ErrRecordNotFound):
-						fmt.Println("No record in DB")
+						app.logger.PrintInfo("No record in DB", nil)
 						errs <- err
 					default:
 						errs <- err
@@ -137,6 +140,8 @@ func(app *application) checkTransaction(done chan bool, b *tele.Bot, link string
 				}
 			
 				err = app.models.Ads.Update(input)
+
+				app.logger.PrintInfo("Update paid status to true in database", nil)
 				
 				if err != nil {
 					switch {

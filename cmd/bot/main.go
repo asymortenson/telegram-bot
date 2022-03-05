@@ -4,11 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"log"
+	"os"
 	"time"
 
 	_ "github.com/lib/pq"
 	"guarantorplace.com/internal/config"
 	"guarantorplace.com/internal/data"
+	"guarantorplace.com/internal/jsonlog"
 
 	tele "gopkg.in/telebot.v3"
 )
@@ -18,6 +20,7 @@ import (
 type application struct {
 	config *config.Config
 	bot *tele.Bot
+	logger *jsonlog.Logger
 	models data.Models
 }
 
@@ -30,6 +33,9 @@ func main() {
 		log.Fatal(err)
 	}
 
+	logger := jsonlog.New(os.Stdout, jsonlog.LevelInfo)
+
+
 	pref := tele.Settings{
 		Token:  cfg.TelegramToken,
 		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
@@ -37,17 +43,16 @@ func main() {
 
 	bot, err := tele.NewBot(pref)
 
-	
-	
+	logger.PrintInfo("bot successfully initialized", nil)
 
 	if err != nil {
-		log.Fatal(err)
+		logger.PrintFatal(err, nil)
 	}
 
 	db, err := openDB(cfg)
 
 	if err != nil {
-		log.Fatal(err)
+		logger.PrintFatal(err, nil)
 	}
 
 	defer db.Close()
@@ -56,6 +61,7 @@ func main() {
 
 	app := &application{
 		config: cfg,
+		logger: logger,
 		bot: bot,
 		models: data.NewModels(db),
 	}
@@ -64,10 +70,8 @@ func main() {
 	err = app.handleUpdates()
 
 	if err != nil {
-		log.Fatal(err)
+		logger.PrintError(err, nil)
 	}
-
-
 	app.bot.Start()
 
 }
