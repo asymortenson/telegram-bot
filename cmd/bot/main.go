@@ -23,6 +23,8 @@ type application struct {
 
 
 func main() {
+
+
 	cfg, err := config.Init()
 	if err != nil {
 		log.Fatal(err)
@@ -34,6 +36,8 @@ func main() {
 	}
 
 	bot, err := tele.NewBot(pref)
+
+	
 	
 
 	if err != nil {
@@ -55,6 +59,7 @@ func main() {
 		bot: bot,
 		models: data.NewModels(db),
 	}
+	
 
 	err = app.handleUpdates()
 

@@ -13,7 +13,7 @@ confirm:
 
 .PHONY: start-container
 start-container:
-	docker run --name telegram-bot-v01 -p 80:80 --env-file .env telegram-bot:0.1
+	docker run --name telegram-bot-v01 -p 8080:8080 --env-file .env telegram-bot:0.1
 
 ## db/psql: connect to the database using psql
 .PHONY: db/psql
