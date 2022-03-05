@@ -80,55 +80,56 @@ func parseEnv(cfg *Config) error {
 
 
 
-	if err := viper.BindEnv("token"); err != nil {
+
+	if err := viper.BindEnv("TOKEN"); err != nil {
 		return err
 	}
 
-	if err := viper.BindEnv("api_key"); err != nil {
+	if err := viper.BindEnv("API_KEY"); err != nil {
 		return err
 	}
 
-	if err := viper.BindEnv("wallet"); err != nil {
+	if err := viper.BindEnv("WALLET"); err != nil {
 		return err
 	}
 
-	if err := viper.BindEnv("fee"); err != nil {
+	if err := viper.BindEnv("FEE"); err != nil {
 		return err
 	}
-	if err := viper.BindEnv("admin_channel"); err != nil {
+	if err := viper.BindEnv("ADMIN_CHANNEL"); err != nil {
 		return err
 	}
-	if err := viper.BindEnv("exchange_channel"); err != nil {
-		return err
-	}
-
-	if err := viper.BindEnv("db_dsn"); err != nil {
+	if err := viper.BindEnv("EXCHANGE_CHANNEL"); err != nil {
 		return err
 	}
 
-	if err := viper.BindEnv("db_max_open_conns"); err != nil {
+	if err := viper.BindEnv("DB_DSN"); err != nil {
 		return err
 	}
 
-	if err := viper.BindEnv("db_max_idle_conns"); err != nil {
+	if err := viper.BindEnv("DB_MAX_OPEN_CONNS"); err != nil {
 		return err
 	}
 
-	if err := viper.BindEnv("db_max_idle_time"); err != nil {
+	if err := viper.BindEnv("DB_MAX_IDLE_CONNS"); err != nil {
+		return err
+	}
+
+	if err := viper.BindEnv("DB_MAX_IDLE_TIME"); err != nil {
 		return err
 	}
 
 	
-	cfg.TelegramToken = viper.GetString("token")
-	cfg.ApiKey = viper.GetString("api_key")
-	cfg.Wallet = viper.GetString("wallet")
-	cfg.ExchangeChannel = viper.GetInt64("exchange_channel")
-	cfg.AdminChannel = viper.GetInt64("admin_channel")
-	cfg.Fee = viper.GetInt("fee")
-	cfg.Db.Dsn = viper.GetString("db_dsn")
-	cfg.Db.MaxOpenConns = viper.GetInt("db_max_open_conns")
-	cfg.Db.MaxIdleConns = viper.GetInt("db_max_idle_conns")
-	cfg.Db.MaxIdleTime = viper.GetString("db_max_idle_time")
+	cfg.TelegramToken = viper.GetString("TOKEN")
+	cfg.ApiKey = viper.GetString("API_KEY")
+	cfg.Wallet = viper.GetString("WALLET")
+	cfg.ExchangeChannel = viper.GetInt64("EXCHANGE_CHANNEL")
+	cfg.AdminChannel = viper.GetInt64("ADMIN_CHANNEL")
+	cfg.Fee = viper.GetInt("FEE")
+	cfg.Db.Dsn = viper.GetString("DB_DSN")
+	cfg.Db.MaxOpenConns = viper.GetInt("DB_MAX_OPEN_CONNS")
+	cfg.Db.MaxIdleConns = viper.GetInt("DB_MAX_IDLE_CONNS")
+	cfg.Db.MaxIdleTime = viper.GetString("DB_MAX_IDLE_TIME")
 
 	return nil
 }
