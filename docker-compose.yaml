@@ -31,7 +31,7 @@ services:
     links:
       - database
     depends_on:
-      - db
+      - database
 
   server:
     build:
