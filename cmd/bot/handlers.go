@@ -32,22 +32,22 @@ func (app *application) handleApproveChannel() error {
 		selector.Row(btnApprove, btnDecline),
 	)		
 	
+	var publicChannelForApprove string
 
 	
 	app.bot.Handle(tele.OnText, func(c tele.Context) error {
-		if err != nil {
-			return err
-		}
 
 		if c.Message().Sender.Username  == ""	{
-		_, err = app.bot.Send(adminBoard, fmt.Sprintf("%d\n%s", c.Message().Sender.ID, c.Text()), selector)
+			publicChannelForApprove = fmt.Sprintf("%d\n%s", c.Message().Sender.ID, c.Text())
+		_, err = app.bot.Send(adminBoard, publicChannelForApprove, selector)
 
 		if err != nil {
 			return err
 		}
 
 		}else {
-			_, err = app.bot.Send(adminBoard, fmt.Sprintf("%d\n%s\n\n%s", c.Message().Sender.ID, "@" + c.Message().Sender.Username, c.Text()), selector)
+			publicChannelForApprove = fmt.Sprintf("%d\n%s\n\n%s", c.Message().Sender.ID, "@" + c.Message().Sender.Username, c.Text())
+			_, err = app.bot.Send(adminBoard, publicChannelForApprove, selector)
 			if err != nil {
 				return err
 			}
@@ -70,14 +70,23 @@ func (app *application) handleApproveChannel() error {
 	
 	app.bot.Handle(&btnApprove, func(c tele.Context) error {
 		var (
+			approvedRow = &tele.ReplyMarkup{}
 			btnPaid = selector.Data(app.config.Messages.PaidBtn, "paid")
 			btnDeclinePaid = selector.Data(app.config.Messages.DeclinePaidBtn, "decline_paid")
-
+			btnApproved = selector.Data(app.config.Messages.ApprovedBtn, "approved")
 		)
+
 		selector.Inline(
 			selector.Row(btnPaid),
 			selector.Row(btnDeclinePaid),
 		)
+
+		approvedRow.Inline(
+			approvedRow.Row(btnApproved),
+		)
+
+		c.Edit(publicChannelForApprove, approvedRow)
+
 
 		arrayOfString := strings.Split(c.Text(), "\n")
 		
@@ -170,6 +179,17 @@ func (app *application) handleApproveChannel() error {
 	})
 
 	app.bot.Handle(&btnDecline, func(c tele.Context) error {
+
+		var (
+			rejectedRow = &tele.ReplyMarkup{}
+			btnRejected = rejectedRow.Data(app.config.Messages.RejectedBtn, "rejected")
+		)
+		rejectedRow.Inline(
+			rejectedRow.Row(btnRejected),
+		)
+
+
+		c.Edit(publicChannelForApprove, rejectedRow)
 
 		id, err := strconv.ParseInt(strings.Split(c.Text(), "\n")[0], 10, 64)
 
