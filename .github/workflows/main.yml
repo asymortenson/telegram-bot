@@ -76,9 +76,18 @@ jobs:
             export AUTH_SERVER_URL=${{ secrets.AUTH_SERVER_URL }}  
 
             # Run a new container from a new image
-            docker run  -d \
+            sudo docker run -e TOKEN \
+            -e AUTH_SERVER_URL \
+            -e API_KEY \
+            -e WALLET \
+            -e FEE \
+            -e ADMIN_CHANNEL \
+            -e EXCHANGE_CHANNEL \
+            -e DB_DSN \
+            -e DB_MAX_OPEN_CONNS \
+            -e DB_MAX_IDLE_CONNS \
+            -e DB_MAX_IDLE_TIME -d \
+
             --restart always \
             --name $(echo $IMAGE_NAME) \
             $(echo $REGISTRY)/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
-
-#-e TOKEN -e AUTH_SERVER_URL -e API_KEY -e WALLET -e FEE -e ADMIN_CHANNEL e- EXCHANGE_CHANNEL e- DB_DSN e- DB_MAX_OPEN_CONNS e- DB_MAX_IDLE_CONNS -e DB_MAX_IDLE_TIME
