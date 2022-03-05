@@ -13,4 +13,6 @@ WORKDIR /root/
 COPY --from=0 /guarantorplace.com/bin/bot .
 COPY --from=0 /guarantorplace.com/configs configs/
 
+EXPOSE 80
+
 CMD ["./bot"]

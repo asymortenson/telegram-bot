@@ -1,4 +1,4 @@
-git remote add origin https://github.com/asymortenson/telegram-bot.gitCREATE TABLE IF NOT EXISTS ads (
+CREATE TABLE IF NOT EXISTS ads (
     id bigserial PRIMARY KEY,
     user_id integer,
     link text,
