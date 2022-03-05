@@ -51,7 +51,7 @@ func(app *application) requestForTransaction(ch chan bool, msg string, errs chan
 
 			app.logger.PrintInfo("Transaction not found", nil)
 
-			if outMsgs.Message == msg && math.Floor(float64(value)*100)/100000000000 == float64(app.config.Fee) {
+			if outMsgs.Message == msg && math.Floor(float64(value)*100)/100000000000 == app.config.Fee {
 				app.logger.PrintInfo("Transaction successfully found", nil)
 				ch <- true
 			}
