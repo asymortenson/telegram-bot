@@ -48,7 +48,7 @@ func(app *application) requestForTransaction(ch chan bool, msg string, errs chan
 			}
 
 			ch <- false
-			
+
 			app.logger.PrintInfo("Transaction not found", nil)
 
 			if outMsgs.Message == msg && math.Floor(float64(value)*100)/100000000000 == float64(app.config.Fee) {
@@ -93,6 +93,22 @@ func(app *application) checkTransaction(done chan bool, b *tele.Bot, link string
 
 	ticker := time.NewTicker(3 * time.Second)
 
+	ad, err := app.models.Ads.GetByMessage(message)
+
+	if err != nil {
+		switch {
+		case errors.Is(err, data.ErrRecordNotFound):
+			app.logger.PrintInfo("No record in DB", nil)
+			errs <- err
+		default:
+			errs <- err
+		}
+	}
+
+	fmt.Println(ad.Msg, ad.Paid)
+
+
+
 	out:for range ticker.C {
 		select {
 			case <- done:
@@ -105,30 +121,20 @@ func(app *application) checkTransaction(done chan bool, b *tele.Bot, link string
 				ticker.Stop()
 				break out
 			case status := <-ch: 
-				if !status {
+				if status && !ad.Paid {
 				target, err := b.ChatByID(app.config.ExchangeChannel)
 
 				if err != nil {
 					errs <- err
 				}
 
+
 				_, err = b.Send(target, link)
 				if err != nil {
 					errs <- err
 				}
 				
-				ad, err := app.models.Ads.GetByMessage(message)
-
-				if err != nil {
-					switch {
-					case errors.Is(err, data.ErrRecordNotFound):
-						app.logger.PrintInfo("No record in DB", nil)
-						errs <- err
-					default:
-						errs <- err
-					}
-				}
-
+	
 				input := &data.Ad{
 				   	UserId:	ad.UserId,
 					Msg: ad.Msg,
@@ -159,6 +165,14 @@ func(app *application) checkTransaction(done chan bool, b *tele.Bot, link string
 				}
 		
 			
+				ticker.Stop()
+			}else if ad.Paid {
+				_, err := b.Send(chat, app.config.Messages.AlreadyPaid, &tele.SendOptions{ParseMode: "MarkdownV2"})
+
+				if err != nil {
+					errs <- err
+				}
+
 				ticker.Stop()
 			}else {
 				continue

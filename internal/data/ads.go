@@ -80,7 +80,7 @@ func (m AdModel) Get(id int64) (*Ad, error) {
 func (m AdModel) GetByMessage(message string) (*Ad, error) {
 
 	query := `
-		SELECT msg, created_at, user_id, id, link, version
+		SELECT msg, created_at, user_id, id, paid, link, version
 		FROM ads
 		WHERE msg = $1
 		`
@@ -94,6 +94,7 @@ func (m AdModel) GetByMessage(message string) (*Ad, error) {
 		&ad.CreatedAt,
 		&ad.UserId,
 		&ad.ID,
+		&ad.Paid,
 		&ad.Link,
 		&ad.Version,
 	)
