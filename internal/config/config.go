@@ -91,6 +91,8 @@ func Init() (*Config, error) {
 }
 
 func parseEnv(cfg *Config) error {
+
+
 	if err := viper.BindEnv("token"); err != nil {
 		return err
 	}
