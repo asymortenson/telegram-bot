@@ -126,7 +126,7 @@ func (app *application) handleApproveChannel() error {
 
 
 
-		paymentMessage := fmt.Sprintf(app.config.Messages.PaymentMessage, "0\\.\\5", app.config.Buttons.Paid, app.config.Wallet, message,)
+		paymentMessage := fmt.Sprintf(app.config.Messages.PaymentMessage, "0\\.\\1", app.config.Buttons.Paid, app.config.Wallet, message,)
 		
 		_, err = app.bot.Send(chat, paymentMessage, &tele.SendOptions{ParseMode: "MarkdownV2", ReplyMarkup: selector})
 		
