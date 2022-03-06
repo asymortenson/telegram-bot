@@ -180,3 +180,19 @@ func(app *application) checkTransaction(done chan bool, b *tele.Bot, link string
 	}
 
 }
+
+
+func (app *application) backToMainMenu(btnBack *tele.Btn, c tele.Context, mainMenu *tele.ReplyMarkup, photo *tele.Photo, text string) {
+	app.bot.Handle(btnBack, func(c tele.Context) error {
+		c.Delete()
+		app.bot.Handle(tele.OnText, func(c tele.Context) error {
+			return nil;
+		})		
+
+		if photo == nil {
+		return c.Send(text, mainMenu)
+		}else {
+		return c.Send(photo, &tele.SendOptions{ParseMode: "MarkdownV2", ReplyMarkup: mainMenu})
+		}
+	})
+}

@@ -19,6 +19,8 @@ type Config struct {
 		MaxIdleTime  string
 	}
 	Messages Messages
+	Buttons Buttons
+	PublicPages PublicPages
 }
 
 type Messages struct {
@@ -26,16 +28,29 @@ type Messages struct {
 }
 
 
+type Buttons struct {
+	Contacts 			string `mapstructure:"contacts"`
+	BuyAd 				string `mapstructure:"buy_ad"`
+	BackToPrevious		 string `mapstructure:"back_to_previous"`
+	Paid                   string `mapstructure:"paid_button"`
+	DeclinePaid            string `mapstructure:"decline_paid_button"`
+	ChoosePublicPage       string `mapstructure:"choose_public_page_button"`
+	CreateRequest          string `mapstructure:"create_request_button"`
+	ApprovePublicPage      string `mapstructure:"approve_public_page_button"`
+	DeclinePublicPage      string `mapstructure:"decline_public_page_button"`
+	Approved 			  string `mapstructure:"approved_button"`
+	Rejected 			  string `mapstructure:"rejected_button"`
+}
+
+type PublicPages struct {
+	Programmer 			  string `mapstructure:"programmer_button"`
+	AboutTon 			  string `mapstructure:"aboutton_button"`
+}
+
 
 type Responses struct {
+	Contacts 				 	string `mapstructure:"contacts"`
 	PutPublicPage             string `mapstructure:"put_public_page"`
-	BackBtn                   string `mapstructure:"back_button"`
-	PaidBtn                   string `mapstructure:"paid_button"`
-	DeclinePaidBtn            string `mapstructure:"decline_paid_button"`
-	ChoosePublicPageBtn       string `mapstructure:"choose_public_page_button"`
-	CreateRequestBtn          string `mapstructure:"create_request_button"`
-	ApprovePublicPageBtn      string `mapstructure:"approve_public_page_button"`
-	DeclinePublicPageBtn      string `mapstructure:"decline_public_page_button"`
 	AfterSubmittingPublicPage string `mapstructure:"after_submitting_public_page"`
 	RejectPublicPage          string `mapstructure:"reject_public_page"`
 	AfterPaymentResponse      string `mapstructure:"after_payment_response"`
@@ -44,8 +59,6 @@ type Responses struct {
 	PaymentMessage            string `mapstructure:"payment_message"`
 	AlreadyPaid 			  string `mapstructure:"already_paid"`
 	Signature 			  	  string `mapstructure:"signature"`
-	ApprovedBtn 			  string `mapstructure:"approved_button"`
-	RejectedBtn 			  string `mapstructure:"rejected_button"`
 
 }
 
@@ -61,6 +74,15 @@ func Init() (*Config, error) {
 		return nil, err
 	}
 
+	if err := viper.UnmarshalKey("buttons", &cfg.Buttons); err != nil {
+		return nil, err
+	}
+
+	if err := viper.UnmarshalKey("public_pages", &cfg.PublicPages); err != nil {
+		return nil, err
+	}
+
+
 	if err := parseEnv(&cfg); err != nil {
 		return nil, err
 	}
@@ -69,6 +91,7 @@ func Init() (*Config, error) {
 }
 
 func parseEnv(cfg *Config) error {
+
 
 	if err := viper.BindEnv("token"); err != nil {
 		return err
