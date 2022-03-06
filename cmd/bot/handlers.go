@@ -17,8 +17,8 @@ func (app *application) handleApproveChannel() error {
 	var (
 		selector = &tele.ReplyMarkup{}
 	
-		btnApprove = selector.Data(app.config.Messages.ApprovePublicPageBtn, "approve")
-		btnDecline = selector.Data(app.config.Messages.DeclinePublicPageBtn, "decline")
+		btnApprove = selector.Data(app.config.Buttons.ApprovePublicPage, "approve")
+		btnDecline = selector.Data(app.config.Buttons.DeclinePublicPage, "decline")
 	
 	)	
 
@@ -71,9 +71,9 @@ func (app *application) handleApproveChannel() error {
 	app.bot.Handle(&btnApprove, func(c tele.Context) error {
 		var (
 			approvedRow = &tele.ReplyMarkup{}
-			btnPaid = selector.Data(app.config.Messages.PaidBtn, "paid")
-			btnDeclinePaid = selector.Data(app.config.Messages.DeclinePaidBtn, "decline_paid")
-			btnApproved = selector.Data(app.config.Messages.ApprovedBtn, "approved")
+			btnPaid = selector.Data(app.config.Buttons.Paid, "paid")
+			btnDeclinePaid = selector.Data(app.config.Buttons.DeclinePaid, "decline_paid")
+			btnApproved = selector.Data(app.config.Buttons.Approved, "approved")
 		)
 
 		selector.Inline(
@@ -126,7 +126,7 @@ func (app *application) handleApproveChannel() error {
 
 
 
-		paymentMessage := fmt.Sprintf(app.config.Messages.PaymentMessage, "0\\.\\5", app.config.Messages.PaidBtn, app.config.Wallet, message,)
+		paymentMessage := fmt.Sprintf(app.config.Messages.PaymentMessage, "0\\.\\5", app.config.Buttons.Paid, app.config.Wallet, message,)
 		
 		_, err = app.bot.Send(chat, paymentMessage, &tele.SendOptions{ParseMode: "MarkdownV2", ReplyMarkup: selector})
 		
@@ -182,7 +182,7 @@ func (app *application) handleApproveChannel() error {
 
 		var (
 			rejectedRow = &tele.ReplyMarkup{}
-			btnRejected = rejectedRow.Data(app.config.Messages.RejectedBtn, "rejected")
+			btnRejected = rejectedRow.Data(app.config.Buttons.Rejected, "rejected")
 		)
 		rejectedRow.Inline(
 			rejectedRow.Row(btnRejected),
@@ -223,53 +223,110 @@ func (app *application) handleStartCommand() error {
 
 	var (
 		mainMenu = &tele.ReplyMarkup{}
-	
-		btnChoosePlace = mainMenu.Data(app.config.Messages.ChoosePublicPageBtn, "place")
-		btnCreateRequest = mainMenu.Data(app.config.Messages.CreateRequestBtn, "create_request")
+		backToMenu = &tele.ReplyMarkup{}
+	    mainMenuPhoto = &tele.Photo{File: tele.FromURL("https://ibb.co/D8h9XKN")}
 
-		photo = &tele.Photo{File: tele.FromURL("https://ibb.co/G5mHG0w")}
+		btnBack = backToMenu.Data(app.config.Buttons.BackToPrevious, "back")
+		btnChoosePlace = mainMenu.Data(app.config.Buttons.ChoosePublicPage, "place")
+		btnCreateRequest = mainMenu.Data(app.config.Buttons.CreateRequest, "create_request")
 	)
 
-
+	backToMenu.Inline(
+		backToMenu.Row(btnBack),
+	)
 	
 	mainMenu.Inline(
-		mainMenu.Row(btnChoosePlace),
 		mainMenu.Row(btnCreateRequest),
+		mainMenu.Row(btnChoosePlace),
 	)
 	
 	
 	app.bot.Handle("/start", func(c tele.Context) error {
-		return c.Send(photo, mainMenu)
+		return c.Send(mainMenuPhoto, mainMenu)
 	})
 
 	app.bot.Handle(&btnChoosePlace, func(c tele.Context) error {
-		return c.Respond(&tele.CallbackResponse{Text: "В разработке!"})
-	})
-
-	app.bot.Handle(&btnCreateRequest, func(c tele.Context) error {
-
-		var backToMenu = &tele.ReplyMarkup{}
-
-		var btnBack = backToMenu.Data(app.config.Messages.BackBtn, "back")
-
-		backToMenu.Inline(
-			backToMenu.Row(btnBack),
+		var (
+			publicPagesMenu = &tele.ReplyMarkup{}
+			btnPublicPageProgrammer = publicPagesMenu.Data(app.config.PublicPages.Programmer, "programmer")
+			btnPublicPageAboutTon = publicPagesMenu.Data(app.config.PublicPages.AboutTon, "about_ton")
+			btnBackToMainMenu = publicPagesMenu.Data(app.config.Buttons.BackToPrevious, "btn_back_to_main_menu")
+			choosePublicPagePhoto = &tele.Photo{File: tele.FromURL("https://i.ibb.co/3MWWymj/Screenshot-2022-03-06-at-11-58-49.png"), Caption: "📣 *Выберите сообщество для покупки рекламы:*"}
 		)
 
 		c.Delete()
 
-		_, err := app.bot.Send(c.Sender(), app.config.Messages.PutPublicPage, &tele.SendOptions{ParseMode:"MarkdownV2", ReplyMarkup: backToMenu})
+		app.backToMainMenu(&btnBackToMainMenu, c, mainMenu, mainMenuPhoto, "")		
+
+		publicPagesMenu.Inline(
+			publicPagesMenu.Row(btnPublicPageProgrammer),
+			publicPagesMenu.Row(btnPublicPageAboutTon),
+			publicPagesMenu.Row(btnBackToMainMenu),
+		)
+
+		app.bot.Handle(&btnPublicPageProgrammer, func(c tele.Context) error {
+			var (
+				publicPageInfoMenu = &tele.ReplyMarkup{}
+				btnBuy = publicPageInfoMenu.URL(app.config.Buttons.BuyAd, "https://telegra.ph/Prajs-list-dlya-soobshchestva-Programmist-03-06")
+				btnBackToPublicPages = publicPageInfoMenu.Data(app.config.Buttons.BackToPrevious, "btn_back_to_public_pages")
+				programmerText = "👥 *Сообщество*: \n• ton\\.\\place/group10316 \n\n☎️ *Контакты*: \n• ton\\.\\place/id39469\n• @goreactdev"
+				choosePublicPagePhoto = &tele.Photo{File: tele.FromURL("https://i.ibb.co/3MWWymj/Screenshot-2022-03-06-at-11-58-49.png"), Caption: "📣 *Выберите сообщество для покупки рекламы:*"}
+
+				programmerMenuPhoto = &tele.Photo{File: tele.FromURL("https://ibb.co/4SsZPmv"), Caption: programmerText}
+			)
+
+			publicPageInfoMenu.Inline(
+				publicPageInfoMenu.Row(btnBuy),
+				publicPageInfoMenu.Row(btnBackToPublicPages),
+			)
+
+			app.backToMainMenu(&btnBackToPublicPages, c, publicPagesMenu, choosePublicPagePhoto, "")
+			
+			c.Delete()
+
+			return c.Send(programmerMenuPhoto, &tele.SendOptions{ReplyMarkup: publicPageInfoMenu, ParseMode: "MarkdownV2"})
+		})
+
+		app.bot.Handle(&btnPublicPageAboutTon, func(c tele.Context) error {
+			var (
+				publicPageInfoMenu = &tele.ReplyMarkup{}
+				btnBuy = publicPageInfoMenu.URL(app.config.Buttons.BuyAd, "https://telegra.ph/price-03-06-2")
+				btnBackToPublicPages = publicPageInfoMenu.Data(app.config.Buttons.BackToPrevious, "btn_back_to_public_pages")
+				programmerText = "👥 *Сообщество*: \n• ton\\.\\place/group15 \n\n☎️ *Контакты*: \n• ton\\.\\place/math\\_is\n• @math\\_is"
+				choosePublicPagePhoto = &tele.Photo{File: tele.FromURL("https://i.ibb.co/3MWWymj/Screenshot-2022-03-06-at-11-58-49.png"), Caption: "📣 *Выберите сообщество для покупки рекламы:*"}
+				programmerMenuPhoto = &tele.Photo{File: tele.FromURL("https://ibb.co/8jDHqH1"), Caption: programmerText}
+			)
+
+			publicPageInfoMenu.Inline(
+				publicPageInfoMenu.Row(btnBuy),
+				publicPageInfoMenu.Row(btnBackToPublicPages),
+			)
+
+			app.backToMainMenu(&btnBackToPublicPages, c, publicPagesMenu, choosePublicPagePhoto, "")
+			
+			c.Delete()
+
+			return c.Send(programmerMenuPhoto, &tele.SendOptions{ReplyMarkup: publicPageInfoMenu, ParseMode: "MarkdownV2"})
+		})
+
+		
+		return c.Send(choosePublicPagePhoto, &tele.SendOptions{ReplyMarkup: publicPagesMenu, ParseMode: "MarkdownV2"})
+	})
+
+	app.bot.Handle(&btnCreateRequest, func(c tele.Context) error {
+
+		var (
+			putPublicPagePhoto = &tele.Photo{File: tele.FromURL("https://i.ibb.co/CMvLWDL/Screenshot-2022-03-06-at-11-57-43.png"), Caption: app.config.Messages.PutPublicPage}
+		)
+
+		c.Delete()
+
+		_, err := app.bot.Send(c.Sender(), putPublicPagePhoto, &tele.SendOptions{ParseMode:"MarkdownV2", ReplyMarkup: backToMenu})
 		if err != nil {
 			return err
 		}
 		
-		app.bot.Handle(&btnBack, func(c tele.Context) error {
-			c.Delete()
-			app.bot.Handle(tele.OnText, func(c tele.Context) error {
-				return nil;
-			})		
-			return c.Send(photo, mainMenu)
-		})
+		app.backToMainMenu(&btnBack, c, mainMenu, mainMenuPhoto , "")		
 
 			
 		err = app.handleApproveChannel()
@@ -295,3 +352,30 @@ func (app *application) handleUpdates() error {
 	}
 	return nil
 }
+
+
+
+// func (app *application) publicPages(btn *tele.Btn, publicPagesMenu *tele.ReplyMarkup, choosePublicPagePhoto *tele.Photo, public data.Public) {
+// 		app.bot.Handle(&btn, func(c tele.Context) error {
+// 			var (
+// 				publicPageInfoMenu = &tele.ReplyMarkup{}
+// 				btnBuy = publicPageInfoMenu.URL(app.config.Buttons.BuyAd, public.TelegraphLink)
+// 				btnBackToPublicPages = publicPageInfoMenu.Data(app.config.Buttons.BackToPrevious, "btn_back_to_public_pages")
+// 				programmerText = "👥 *Сообщество*: \n• ton\\.\\place/group10316 \n\n☎️ *Контакты*: \n• ton\\.\\place/id39469\n• @goreactdev"
+
+// 				programmerMenuPhoto = &tele.Photo{File: tele.FromURL("https://ibb.co/4SsZPmv"), Caption: programmerText}
+// 			)
+
+// 			publicPageInfoMenu.Inline(
+// 				publicPageInfoMenu.Row(btnBuy),
+// 				publicPageInfoMenu.Row(btnBackToPublicPages),
+// 			)
+
+// 			app.backToMainMenu(&btnBackToPublicPages, c, publicPagesMenu, choosePublicPagePhoto, "")
+			
+// 			c.Delete()
+
+// 			return c.Send(programmerMenuPhoto, &tele.SendOptions{ReplyMarkup: publicPageInfoMenu, ParseMode: "MarkdownV2"})
+// 		})
+
+// }

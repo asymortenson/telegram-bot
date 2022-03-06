@@ -7,6 +7,7 @@ import (
 
 type Models struct {
 	Ads AdModel
+	Publics PublicModel
 }
 
 var (
@@ -18,5 +19,6 @@ var (
 func NewModels(db *sql.DB) Models {
 	return Models{
 		Ads: AdModel{DB: db},
+		Publics: PublicModel{DB: db},
 	}
 }
