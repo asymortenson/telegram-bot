@@ -38,7 +38,7 @@ func (app *application) handleApproveChannel() error {
 	app.bot.Handle(tele.OnText, func(c tele.Context) error {
 
 		if c.Message().Sender.Username  == ""	{
-			publicChannelForApprove = fmt.Sprintf("%d\n%s", c.Message().Sender.ID, c.Text())
+			publicChannelForApprove = fmt.Sprintf("%d\n\n%s", c.Message().Sender.ID, c.Text())
 		_, err = app.bot.Send(adminBoard, publicChannelForApprove, selector)
 
 		if err != nil {
@@ -97,6 +97,9 @@ func (app *application) handleApproveChannel() error {
 			return err
 		}
 
+		textForSend := strings.Split(c.Text(), "\n\n")
+
+
 
 		chat, err := app.bot.ChatByID(id)
 
@@ -114,7 +117,7 @@ func (app *application) handleApproveChannel() error {
 
 		ad := &data.Ad{
 				UserId:   id,
-				Link:    arrayOfString[len(arrayOfString)-1],
+				Link: textForSend[1],
 				Msg: message,
 		}
 
@@ -126,7 +129,7 @@ func (app *application) handleApproveChannel() error {
 
 
 
-		paymentMessage := fmt.Sprintf(app.config.Messages.PaymentMessage, "0\\.\\1", app.config.Buttons.Paid, app.config.Wallet, message,)
+		paymentMessage := fmt.Sprintf(app.config.Messages.PaymentMessage, app.config.Buttons.Paid, "0\\.\\2",  app.config.Wallet, message)
 		
 		_, err = app.bot.Send(chat, paymentMessage, &tele.SendOptions{ParseMode: "MarkdownV2", ReplyMarkup: selector})
 		
@@ -139,12 +142,25 @@ func (app *application) handleApproveChannel() error {
 
 		app.bot.Handle(&btnPaid, func(c tele.Context) error {
 
+			var (
+				paidRow = &tele.ReplyMarkup{}
+			)
+	
+			paidRow.Inline(
+				paidRow.Row(btnDeclinePaid),
+			)
+	
+			c.Edit(paymentMessage, &tele.SendOptions{ParseMode: "MarkdownV2", ReplyMarkup: paidRow})
+	
+
 
 			ad, err := app.models.Ads.Get(c.Chat().ID)
+
 
 			if err != nil {
 				return err
 			}
+			
 
 			errs := make(chan error, 1)
 

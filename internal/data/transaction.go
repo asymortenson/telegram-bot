@@ -1,12 +1,12 @@
 package data
 
-type OutMessage struct {
+type InMessage struct {
 	Message string `json:"message,omitempty"`
 	Value   string `json:"value,omitempty"`
 }
 
 type Transaction struct {
-	OutMessage []OutMessage `json:"out_msgs,omitempty"`
+	InMessage InMessage `json:"in_msg,omitempty"`
 }
 
 type Response struct {
