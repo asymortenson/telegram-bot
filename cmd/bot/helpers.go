@@ -16,7 +16,8 @@ import (
 
 func(app *application) requestForTransaction(ch chan bool, msg string, errs chan error) {
 	client := &http.Client{}
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://toncenter.com/api/v2/getTransactions?address=%s&limit=100&to_lt=0&archival=false&api_key=%s", app.config.Wallet, app.config.ApiKey), nil)
+	requestLink := fmt.Sprintf("https://toncenter.com/api/v2/getTransactions?address=%s&limit=25&to_lt=0&archival=false&api_key=%s", app.config.Wallet, app.config.ApiKey)
+	req, err := http.NewRequest(http.MethodGet, requestLink, nil)
 	
 	
 	if err != nil {
@@ -38,25 +39,25 @@ func(app *application) requestForTransaction(ch chan bool, msg string, errs chan
 
 	json.NewDecoder(resp.Body).Decode(&res)
 
+	var exist bool
+
 	for _, item := range res.Result {
-		for _, outMsgs := range item.OutMessage {
 
-			value, err := strconv.Atoi(outMsgs.Value)
-
+			value, err := strconv.Atoi(item.InMessage.Value)
 			if err != nil {
 				errs <- err
 			}
 
-			ch <- false
-
-			app.logger.PrintInfo("Transaction not found", nil)
-
-			if outMsgs.Message == msg && math.Floor(float64(value)*100)/100000000000 == app.config.Fee {
+			if item.InMessage.Message == msg && math.Floor(float64(value)*100)/100000000000 == app.config.Fee {
 				app.logger.PrintInfo("Transaction successfully found", nil)
+				exist = true
 				ch <- true
 			}
+	}
 
-		}
+	if !exist {
+		ch <- false
+		app.logger.PrintInfo("Transaction not found", nil)
 	}
 
 }
