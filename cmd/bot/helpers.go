@@ -85,6 +85,7 @@ func generateUniqueMessage() (string, error) {
 func(app *application) checkTransaction(done chan bool, b *tele.Bot, link string, chat *tele.Chat, message string, errs chan error) {
 
 	_, err := b.Send(chat, app.config.Messages.AfterPaymentResponse, &tele.SendOptions{ParseMode: "MarkdownV2"})
+//delete configs
 
 	if err != nil {
 		errs <- err

@@ -61,6 +61,7 @@ type Responses struct {
 	Signature 			  	  string `mapstructure:"signature"`
 
 }
+//delete configs
 
 func Init() (*Config, error) {
 	var cfg Config
